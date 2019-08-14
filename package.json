@@ -1,0 +1,11 @@
+{
+  "name": "vue-crud-generator",
+  "version": "1.0.0",
+  "description": "Following package generates simple crud for vue projects",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Saiat Kalbiev",
+  "license": "ISC"
+}
