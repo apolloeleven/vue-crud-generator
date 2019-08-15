@@ -15,5 +15,12 @@ module.exports = {
     demand: true,
     alias: 'fn',
     describe: 'Comma separated field names',
+    string: true
+  },
+  'api-url': {
+    demand: true,
+    alias: 'au',
+    describe: 'Api endpoint url for services.',
+    string: true
   }
 };
