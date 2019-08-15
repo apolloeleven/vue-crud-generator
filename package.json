@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "pluralize": "^8.0.0",
+    "prompt-confirm": "^2.0.4",
     "yargs": "^13.3.0"
   }
 }
