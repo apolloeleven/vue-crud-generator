@@ -38,8 +38,8 @@
       }
     },
     methods: {
-      get{{componentName}}() {
-        {{serviceName}}.get{{componentName}}()
+      get{{componentNamePlural}}() {
+        {{serviceName}}.get{{componentNamePlural}}()
           .then(response => {
             this.{{listVariableName}} = response.data;
           }, error => {
@@ -53,7 +53,7 @@
       }
     },
     beforeMount() {
-      this.get{{componentName}}();
+      this.get{{componentNamePlural}}();
     }
   }
 </script>

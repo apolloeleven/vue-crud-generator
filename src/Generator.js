@@ -10,13 +10,17 @@ class Generator {
     this.path = params.path;
     this.name = params.name;
     this.field_names = params.field_names;
+    this.api_url = params.api_url;
   }
 
   init() {
 
     this.checkDirValidity();
+    this.prepareVariables();
 
     this.createMainComponent();
+
+    this.createService();
 
   }
 
@@ -28,38 +32,57 @@ class Generator {
     }
   }
 
+  prepareVariables() {
+    this.mainDivClass = GeneralHelper.unCapitalize(this.name);
+    this.mainUrl = this.mainDivClass.replace(/([A-Z])/g, (g) => `-${g[0].toLowerCase()}`)
+    this.componentName = GeneralHelper.capitalize(this.mainDivClass);
+    this.serviceName = `${this.componentName}Service`;
+  }
+
   createMainComponent() {
 
-    let mainDivClass = GeneralHelper.unCapitalize(this.name);
-    let mainUrl = mainDivClass.replace(/([A-Z])/g, (g) => `-${g[0].toLowerCase()}`)
-    let componentName = GeneralHelper.capitalize(mainDivClass);
-    let serviceName = `${componentName}Service`;
+    const templateFile = path.join(__dirname, 'templates/main.component.template');
+    const newFile = path.join(this.path, `${this.componentName}.vue`);
 
-    const templateFile = path.join(__dirname, 'templates/main.component');
-    const newFile = path.join(this.path, `${componentName}.vue`);
-
-    try {
-      fs.copyFileSync(templateFile, newFile);
-    } catch (err) {
-      throw new Error(`Error occurred while copying main component template file. Message: ${err.message}`);
-    }
+    this.createFileFromTemplate(templateFile, newFile);
 
     fs.readFile(newFile, 'utf8', (err, data) => {
-      if (err) throw new Error(`Error while reading newly created file. Message: ${err.message}`);
+      if (err) throw new Error(`Error while reading newly created component file. Message: ${err.message}`);
 
       let result = data
-        .replace('{{mainDivClass}}', mainDivClass)
-        .replace(/{{componentName}}/g, pluralize.plural(componentName))
-        .replace(/{{listVariableName}}/g, pluralize.plural(mainDivClass))
+        .replace('{{mainDivClass}}', this.mainDivClass)
+        .replace(/{{componentName}}/g, this.componentName)
+        .replace(/{{componentNamePlural}}/g, pluralize.plural(this.componentName))
+        .replace(/{{listVariableName}}/g, pluralize.plural(this.mainDivClass))
         .replace('{{tableFields}}', this.getTableFieldsFileData())
-        .replace(/{{mainUrl}}/g, mainUrl)
-        .replace(/{{serviceName}}/g, serviceName);
+        .replace(/{{mainUrl}}/g, this.mainUrl)
+        .replace(/{{serviceName}}/g, this.serviceName);
 
       fs.writeFile(newFile, result, 'utf8', function (err) {
         if (err) throw new Error(`Error while saving newly updated file. Message: ${err.message}`)
       });
     });
 
+  }
+
+  createService() {
+    const templateFile = path.join(__dirname, 'templates/service.template');
+    const newFile = path.join(this.path, `${this.componentName}Service.js`);
+
+    this.createFileFromTemplate(templateFile, newFile);
+
+    fs.readFile(newFile, 'utf8', (err, data) => {
+      if (err) throw new Error(`Error while reading newly created service file. Message: ${err.message}`);
+
+      let result = data
+        .replace(/{{componentName}}/g, this.componentName)
+        .replace(/{{apiUrl}}/g, this.api_url)
+        .replace(/{{componentNamePlural}}/g, pluralize.plural(this.componentName));
+
+      fs.writeFile(newFile, result, 'utf8', function (err) {
+        if (err) throw new Error(`Error while saving newly updated service file. Message: ${err.message}`)
+      });
+    });
   }
 
   getTableFieldsFileData() {
@@ -71,6 +94,14 @@ class Generator {
       }
     }
     return returnData;
+  }
+
+  createFileFromTemplate(templateFile, newFile) {
+    try {
+      fs.copyFileSync(templateFile, newFile);
+    } catch (err) {
+      throw new Error(`Error occurred while copying template file. Message: ${err.message}`);
+    }
   }
 
 }
