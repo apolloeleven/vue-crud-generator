@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const pluralize = require('pluralize');
+const Confirm = require('prompt-confirm');
 
 const GeneralHelper = require('./helpers/general-helper');
 
@@ -17,21 +18,32 @@ class Generator {
   }
 
   init() {
-    this.checkDirValidity();
-    this.prepareVariables();
-
-    this.createMainComponent();
-    this.createService();
-    this.createFormComponent();
-    this.createModule();
+    this.checkDirValidity().then(success => {
+      this.prepareVariables();
+      this.createMainComponent();
+      this.createService();
+      this.createFormComponent();
+      this.createModule();
+    }, error => {
+    });
   }
 
   checkDirValidity() {
-    if (!fs.existsSync(this.path)) {
-      fs.mkdirSync(this.path);
-    } else {
-      throw new Error('Folder already exists in the provided path.')
-    }
+    return new Promise((resolve, reject) => {
+      if (!fs.existsSync(this.path)) {
+        fs.mkdirSync(this.path);
+        resolve();
+      } else {
+        (new Confirm("Folder already exists. Do you want to overwrite it ?")).run().then((answer) => {
+          if (!answer) {
+            reject()
+          } else {
+            GeneralHelper.emptyDir(this.path);
+            resolve();
+          }
+        });
+      }
+    });
   }
 
   prepareVariables() {
