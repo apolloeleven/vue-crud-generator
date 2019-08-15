@@ -24,6 +24,8 @@ class Generator {
 
     this.createFormComponent();
 
+    this.createModule();
+
   }
 
   checkDirValidity() {
@@ -106,6 +108,26 @@ class Generator {
         .replace(/{{mainUrl}}/g, this.mainUrl)
         .replace(/{{inputFields}}/g, this.getFormInputFieldsFileData())
         .replace(/{{serviceName}}/g, this.serviceName);
+
+      fs.writeFile(newFile, result, 'utf8', function (err) {
+        if (err) throw new Error(`Error while saving newly updated form component file. Message: ${err.message}`)
+      });
+    });
+  }
+
+  createModule() {
+    const templateFile = path.join(__dirname, 'templates/module.template');
+    const newFile = path.join(this.path, `${this.componentName}.module.js`);
+
+    this.createFileFromTemplate(templateFile, newFile);
+
+    fs.readFile(newFile, 'utf8', (err, data) => {
+      if (err) throw new Error(`Error while reading newly created module file. Message: ${err.message}`);
+
+      let result = data
+        .replace(/{{componentName}}/g, this.componentName)
+        .replace(/{{mainUrl}}/g, this.mainUrl)
+        .replace(/{{componentNameVisualPlural}}/g, pluralize.plural(this.componentNameVisual));
 
       fs.writeFile(newFile, result, 'utf8', function (err) {
         if (err) throw new Error(`Error while saving newly updated service file. Message: ${err.message}`)

@@ -1,0 +1,39 @@
+import router from '../../router'
+import {{componentName}} from './{{componentName}}.vue'
+import {{componentName}}Form from './{{componentName}}Form.vue'
+import MenuService from "../../components/Menu/MenuService";
+import MenuItem from "../../components/Menu/MenuItem";
+import {library} from '@fortawesome/fontawesome-svg-core'
+import {faUsers} from '@fortawesome/free-solid-svg-icons'
+
+library.add(faUsers);
+
+let {routes} = router.options;
+const route = routes.find(r => r.path === '/');
+
+let tmpRoutes = [{
+  path: '{{mainUrl}}',
+  component: {{componentName}},
+  meta: {
+    requiresAuth: true
+  }
+}, {
+  path: '{{mainUrl}}/create',
+  component: {{componentName}}Form,
+  meta: {
+    requiresAuth: true
+  },
+}, {
+  path: '{{mainUrl}}/:id',
+  component: {{componentName}}Form,
+  meta: {
+    requiresAuth: true
+  },
+},];
+
+tmpRoutes.forEach((obj) => {
+  route.children.push(obj);
+});
+
+router.addRoutes([route]);
+MenuService.addMenuItem(new MenuItem('/{{mainUrl}}', '{{componentNameVisualPlural}}', 40, 'users'));
