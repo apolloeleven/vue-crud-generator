@@ -11,7 +11,8 @@ const argv = yargs
 
 let generator = new Generator({
   name: argv.name,
-  path: argv.path
+  path: argv.path,
+  field_names: argv['field-names'].split(',')
 });
 
 generator.init();
