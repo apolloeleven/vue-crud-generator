@@ -1,8 +1,8 @@
 <template>
   <div class="{{mainDivClass}}">
 
-    <h1 v-if="user.id">Update{{componentNameVisual}}: {{{{objectVariableName}}.id}}</h1>
-    <h1 v-if="!user.id">Create{{componentNameVisual}}</h1>
+    <h1 v-if="{{objectVariableName}}.id">Update{{componentNameVisual}}: {{{{objectVariableName}}.id}}</h1>
+    <h1 v-if="!{{objectVariableName}}.id">Create{{componentNameVisual}}</h1>
 
     <b-form @submit.prevent="onSubmit" @reset="onReset">
       {{inputFields}}
