@@ -11,4 +11,9 @@ module.exports = {
     describe: 'The path where the crud folder and its data will be generated',
     string: true
   },
+  'field-names': {
+    demand: true,
+    alias: 'fn',
+    describe: 'Comma separated field names',
+  }
 };
