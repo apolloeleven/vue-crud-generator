@@ -1,0 +1,17 @@
+import Vue from 'vue'
+import {AppSettings} from "../../shared/AppSettings";
+
+export default {
+  get{{componentNamePlural}}(params = null) {
+    return Vue.http.get(AppSettings.getUrl('/{{apiUrl}}/'), params);
+  },
+  get{{componentName}}(id) {
+    return Vue.http.get(AppSettings.getUrl(`/{{apiUrl}}/${id}`));
+  },
+  update{{componentName}}(id, data) {
+    return Vue.http.put(AppSettings.getUrl(`/{{apiUrl}}/${id}/`), data);
+  },
+  create{{componentName}}(data) {
+    return Vue.http.post(AppSettings.getUrl('/{{apiUrl}}/'), data);
+  }
+};
