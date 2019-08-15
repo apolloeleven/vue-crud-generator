@@ -1,0 +1,63 @@
+<template>
+  <div class="{{mainDivClass}}">
+
+    <b-button variant="success" to="/{{mainUrl}}/create">Create User</b-button>
+
+    <b-table class="main-table" responsive bordered :items="{{listVariableName}}" :fields="tableFields">
+      <template slot="actions" slot-scope="data">
+        <b-button variant="success" class="btn mr-1" @click="update(data.item)" v-b-tooltip.hover title="Update">
+          <font-awesome-icon :icon="'pen'"></font-awesome-icon>
+        </b-button>
+      </template>
+    </b-table>
+
+  </div>
+</template>
+
+<script>
+
+  import {{serviceName}} from './{{serviceName}}';
+
+  import {library} from '@fortawesome/fontawesome-svg-core';
+  import {faPen} from '@fortawesome/free-solid-svg-icons';
+
+  export default {
+    name: '{{componentName}}',
+    props: [],
+    data: () => {
+      return {
+        {{listVariableName}}: [],
+        tableFields: [
+{{tableFields}}
+          {
+            key: 'actions',
+            label: 'Actions',
+            sortable: false
+          }
+        ]
+      }
+    },
+    methods: {
+      get{{componentName}}() {
+        {{serviceName}}.get{{componentName}}()
+          .then(response => {
+            this.{{listVariableName}} = response.data;
+          }, error => {
+            //TODO show error
+          });
+      },
+      update(param) {
+        this.$router.push({
+          path: `{{mainUrl}}/${param.id}`
+        });
+      }
+    },
+    beforeMount() {
+      this.get{{componentName}}();
+    }
+  }
+</script>
+
+<style scoped lang="scss">
+
+</style>
