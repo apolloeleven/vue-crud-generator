@@ -1,0 +1,61 @@
+<template>
+  <div class="{{mainDivClass}}">
+
+    <h1 v-if="user.id">Update{{componentNameVisual}}: {{{{objectVariableName}}.id}}</h1>
+    <h1 v-if="!user.id">Create{{componentNameVisual}}</h1>
+
+    <b-form @submit.prevent="onSubmit" @reset="onReset">
+      {{inputFields}}
+      <b-button type="submit" variant="primary" class="mr-1">Submit</b-button>
+      <b-button type="reset" variant="danger">Reset</b-button>
+    </b-form>
+
+  </div>
+</template>
+
+<script>
+  import {{serviceName}} from './{{serviceName}}';
+
+  export default {
+    name: "{{componentName}}Form",
+    data: () => {
+      return {
+        {{objectVariableName}}: {}
+      }
+    },
+    methods: {
+      onSubmit() {
+        if (this.{{objectVariableName}}.id) {
+          {{serviceName}}.update{{componentName}}(this.{{objectVariableName}}.id, this.{{objectVariableName}})
+            .then(response => {
+              this.$router.push({path: '/{{mainUrl}}'})
+            }, error => {
+              // TODO throw error
+            });
+        } else {
+          {{serviceName}}.create{{componentName}}(this.user)
+            .then(response => {
+              this.$router.push({path: '/{{mainUrl}}'})
+            }, error => {
+              // TODO throw error
+            });
+        }
+      },
+      onReset() {
+      }
+    },
+    beforeMount() {
+      if (this.$route.params.id) {
+        {{serviceName}}.get{{componentName}}(this.$route.params.id)
+          .then(response => {
+            this.{{objectVariableName}} = response.data;
+          }, error => {
+            //TODO throw error
+          });
+      }
+    }
+  }
+</script>
+
+<style lang="scss">
+</style>

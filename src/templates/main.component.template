@@ -1,7 +1,7 @@
 <template>
   <div class="{{mainDivClass}}">
 
-    <b-button variant="success" to="/{{mainUrl}}/create">Create User</b-button>
+    <b-button variant="success" to="/{{mainUrl}}/create">Create{{componentNameVisual}}</b-button>
 
     <b-table class="main-table" responsive bordered :items="{{listVariableName}}" :fields="tableFields">
       <template slot="actions" slot-scope="data">
