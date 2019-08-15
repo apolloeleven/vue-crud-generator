@@ -12,7 +12,8 @@ const argv = yargs
 let generator = new Generator({
   name: argv.name,
   path: argv.path,
-  field_names: argv['field-names'].split(',')
+  field_names: argv['field-names'].split(','),
+  api_url: argv['api-url']
 });
 
 generator.init();
