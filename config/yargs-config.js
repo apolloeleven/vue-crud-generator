@@ -17,6 +17,11 @@ module.exports = {
     describe: 'Comma separated field names',
     string: true
   },
+  'translatable-field-names': {
+    alias: 'tfn',
+    describe: 'Comma separated field names which are translatable',
+    string: true
+  },
   'api-url': {
     demand: true,
     alias: 'au',
