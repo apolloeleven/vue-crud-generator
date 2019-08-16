@@ -94,6 +94,7 @@ class Generator {
       let result = data
         .replace(/{{componentName}}/g, this.componentName)
         .replace(/{{apiUrl}}/g, this.api_url)
+        .replace(/{{translatableFields}}/g, this.getServiceTranslatableFieldsData())
         .replace(/{{componentNamePlural}}/g, pluralize.plural(this.componentName));
 
       fs.writeFile(newFile, result, 'utf8', function (err) {
@@ -222,6 +223,18 @@ class Generator {
     }
 
     return returnData.replace('{{innerData}}', innerData);
+  }
+
+  getServiceTranslatableFieldsData() {
+    let returnData = "";
+    for (var i = 0; i < this.field_names.length; i++) {
+      returnData += `
+        {
+          name: '${this.field_names[i]}',
+          type: 'text',
+        },`;
+    }
+    return returnData;
   }
 
   createFileFromTemplate(templateFile, newFile) {

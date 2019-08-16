@@ -13,5 +13,11 @@ export default {
   },
   create{{componentName}}(data) {
     return Vue.http.post(AppSettings.getUrl('/{{apiUrl}}/'), data);
+  },
+  getGeneralFields() {
+    return {
+      translatableFields: [{{translatableFields}}
+      ],
+    }
   }
 };
