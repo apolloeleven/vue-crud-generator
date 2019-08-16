@@ -14,6 +14,7 @@ class Generator {
     this.path = params.path;
     this.name = params.name;
     this.field_names = params.field_names;
+    this.translatable_field_names = params.translatable_field_names;
     this.api_url = params.api_url;
   }
 
@@ -112,11 +113,12 @@ class Generator {
 
       let result = data
         .replace(/{{mainDivClass}}/g, `${this.mainUrl}-form`)
-        .replace(/{{componentNameVisual}}/g, this.componentNameVisual)
+        .replace(/{{componentNameVisual}}/g, this.componentNameVisual.trim())
         .replace(/{{componentName}}/g, this.componentName)
         .replace(/{{objectVariableName}}/g, this.unCapitalizedComponentName)
         .replace(/{{mainUrl}}/g, this.mainUrl)
         .replace(/{{inputFields}}/g, this.getFormInputFieldsFileData())
+        .replace(/{{translatableInputFields}}/g, this.getFormTranslatableInputFieldsFileData())
         .replace(/{{serviceName}}/g, this.serviceName);
 
       fs.writeFile(newFile, result, 'utf8', function (err) {
@@ -159,15 +161,50 @@ class Generator {
   getFormInputFieldsFileData() {
     let returnData = "";
 
-    for (var i = 0; i < this.field_names.length; i++) {
+    for (let i = 0; i < this.field_names.length; i++) {
       const vModelData = `${this.unCapitalizedComponentName}.${this.field_names[i]}`;
+      const labelText = GeneralHelper.eachWordCapitalize(this.field_names[i].replace('_', ' '));
+
       returnData += `
-        <b-form-group label="${this.field_names[i]}" label-for="input-${this.field_names[i]}">
-          <b-form-input id="input-${this.field_names[i]}" v-model="${vModelData}" placeholder="Enter ${this.field_names[i]} here"></b-form-input>
-        </b-form-group>\n`;
+      <b-form-group b-form-group v-bind:label="$t('${labelText}')">
+        <b-form-input v-model="${vModelData}"></b-form-input>
+      </b-form-group>\n`;
     }
 
     return returnData;
+  }
+
+  getFormTranslatableInputFieldsFileData() {
+
+    if (this.translatable_field_names.length === 0) {
+      return '';
+    }
+
+    let returnData = `
+      <div v-if="translatableFields.length > 0">
+        <b-tabs content-class="mt-3">
+          <b-tab v-for="locale in locales" v-bind:title="locale.name">
+            <div class="form-group">
+              {{innerData}}
+            </div>
+          </b-tab>
+        </b-tabs>
+      </div>`;
+
+    let innerData = '';
+
+    for (let i = 0; i < this.translatable_field_names.length; i++) {
+      const labelText = GeneralHelper.eachWordCapitalize(this.translatable_field_names[i].replace('_', ' '));
+
+      innerData += `
+              <b-form-group v-bind:label="$t('${labelText}')">
+                <b-form-input v-model="${this.unCapitalizedComponentName}['${this.field_names[i]}'][locale.key]">
+                </b-form-input>
+              </b-form-group>\n`;
+
+    }
+
+    return returnData.replace('{{innerData}}', innerData);
   }
 
   createFileFromTemplate(templateFile, newFile) {

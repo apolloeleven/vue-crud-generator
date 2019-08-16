@@ -13,6 +13,7 @@ let generator = new Generator({
   name: argv.name,
   path: argv.path,
   field_names: argv['field-names'].split(','),
+  translatable_field_names: argv['translatable-field-names'] ? argv['translatable-field-names'].split(',') : [],
   api_url: argv['api-url']
 });
 

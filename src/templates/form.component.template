@@ -1,39 +1,46 @@
 <template>
   <div class="{{mainDivClass}}">
 
-    <h1 v-if="{{objectVariableName}}.id">Update{{componentNameVisual}}: {{{{objectVariableName}}.id}}</h1>
-    <h1 v-if="!{{objectVariableName}}.id">Create{{componentNameVisual}}</h1>
+    <h1 v-if="{{objectVariableName}}.uuid">{{$t('Update')}} {{$t('{{componentNameVisual}}')}}</h1>
+    <h1 v-if="!{{objectVariableName}}.uuid">{{$t('Create')}} {{$t('{{componentNameVisual}}')}}</h1>
 
-    <b-form @submit.prevent="onSubmit" @reset="onReset">
+    <b-form @submit.prevent="onSubmit">
       {{inputFields}}
-      <b-button type="submit" variant="primary" class="mr-1">Submit</b-button>
-      <b-button type="reset" variant="danger">Reset</b-button>
+      {{translatableInputFields}}
+      <b-button type="submit" variant="primary" class="mr-1">{{$t('Submit')}}</b-button>
+      <b-button type="reset" variant="danger">{{$t('Reset')}}</b-button>
+
     </b-form>
 
   </div>
 </template>
 
 <script>
+
   import {{serviceName}} from './{{serviceName}}';
+  import i18n from './../../services/i18n';
 
   export default {
     name: "{{componentName}}Form",
     data: () => {
       return {
+        locales: [],
+        fields: [],
+        translatableFields: [],
         {{objectVariableName}}: {}
       }
     },
     methods: {
       onSubmit() {
-        if (this.{{objectVariableName}}.id) {
-          {{serviceName}}.update{{componentName}}(this.{{objectVariableName}}.id, this.{{objectVariableName}})
+        if (this.{{objectVariableName}}.uuid) {
+          {{serviceName}}.update{{componentName}}(this.{{objectVariableName}}.uuid, this.{{objectVariableName}})
             .then(response => {
               this.$router.push({path: '/{{mainUrl}}'})
             }, error => {
               // TODO throw error
             });
         } else {
-          {{serviceName}}.create{{componentName}}(this.user)
+          {{serviceName}}.create{{componentName}}(this.{{objectVariableName}})
             .then(response => {
               this.$router.push({path: '/{{mainUrl}}'})
             }, error => {
@@ -41,10 +48,16 @@
             });
         }
       },
-      onReset() {
+      initFields() {
+        let generalFields = {{serviceName}}.getGeneralFields();
+        this.translatableFields = generalFields.translatableFields;
       }
     },
     beforeMount() {
+      this.initFields();
+      this.locales = i18n.getAvailableLocales();
+      i18n.initTranslatableFields(this.{{objectVariableName}}, this.translatableFields);
+
       if (this.$route.params.id) {
         {{serviceName}}.get{{componentName}}(this.$route.params.id)
           .then(response => {
@@ -58,4 +71,10 @@
 </script>
 
 <style lang="scss">
+  .{{mainDivClass}} {
+    form {
+      background-color: #fafafa;
+      padding: 15px 20px;
+    }
+  }
 </style>
