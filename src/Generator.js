@@ -139,7 +139,7 @@ class Generator {
       let result = data
         .replace(/{{componentName}}/g, this.componentName)
         .replace(/{{mainUrl}}/g, this.mainUrl)
-        .replace(/{{componentNameVisualPlural}}/g, pluralize.plural(this.componentNameVisual));
+        .replace(/{{componentNameVisualPlural}}/g, pluralize.plural(this.componentNameVisual).trim());
 
       fs.writeFile(newFile, result, 'utf8', function (err) {
         if (err) throw new Error(`Error while saving newly updated service file. Message: ${err.message}`)

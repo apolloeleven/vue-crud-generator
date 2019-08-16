@@ -4,9 +4,10 @@ import {{componentName}}Form from './{{componentName}}Form.vue'
 import MenuService from "../../components/Menu/MenuService";
 import MenuItem from "../../components/Menu/MenuItem";
 import {library} from '@fortawesome/fontawesome-svg-core'
-import {faUsers} from '@fortawesome/free-solid-svg-icons'
+import {faGlobe} from '@fortawesome/free-solid-svg-icons'
+import i18n from './../../i18n'
 
-library.add(faUsers);
+library.add(faGlobe);
 
 let {routes} = router.options;
 const route = routes.find(r => r.path === '/');
@@ -18,7 +19,7 @@ let tmpRoutes = [{
     requiresAuth: true
   }
 }, {
-  path: '{{mainUrl}}/create',
+  path: '/{{mainUrl}}/create',
   component: {{componentName}}Form,
   meta: {
     requiresAuth: true
@@ -29,11 +30,13 @@ let tmpRoutes = [{
   meta: {
     requiresAuth: true
   },
-},];
+},
+];
 
 tmpRoutes.forEach((obj) => {
   route.children.push(obj);
 });
 
 router.addRoutes([route]);
-MenuService.addMenuItem(new MenuItem('/{{mainUrl}}', '{{componentNameVisualPlural}}', 40, 'users'));
+
+MenuService.addMenuItem(new MenuItem('/{{mainUrl}}', i18n.t('{{componentNameVisualPlural}}'), 40, 'globe'));
