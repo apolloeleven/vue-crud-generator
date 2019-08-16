@@ -66,13 +66,13 @@ class Generator {
       if (err) throw new Error(`Error while reading newly created component file. Message: ${err.message}`);
 
       let result = data
-        .replace('{{mainDivClass}}', this.mainUrl)
+        .replace(/{{mainDivClass}}/g, this.mainUrl)
         .replace(/{{componentName}}/g, this.componentName)
         .replace(/{{componentNamePlural}}/g, pluralize.plural(this.componentName))
         .replace(/{{listVariableName}}/g, pluralize.plural(this.unCapitalizedComponentName))
-        .replace('{{tableFields}}', this.getTableFieldsFileData())
+        .replace('{{tableFields}}', this.getTableFieldsFileData() + this.getTableTranslatableFieldsFileData())
         .replace(/{{mainUrl}}/g, this.mainUrl)
-        .replace(/{{componentNameVisual}}/g, this.componentNameVisual)
+        .replace(/{{componentNameVisual}}/g, this.componentNameVisual.trim())
         .replace(/{{serviceName}}/g, this.serviceName);
 
       fs.writeFile(newFile, result, 'utf8', function (err) {
@@ -150,10 +150,27 @@ class Generator {
   getTableFieldsFileData() {
     let returnData = "";
     for (var i = 0; i < this.field_names.length; i++) {
-      returnData += `\t\t\t\t\t'${this.field_names[i]}',`;
-      if (i !== this.field_names.length - 1) {
-        returnData += '\n';
-      }
+      returnData += `
+          {
+            key: "${this.field_names[i]}",
+            label: this.$i18n.t('${GeneralHelper.eachWordCapitalize(this.field_names[i].replace('_', ' '))}')
+          },`;
+    }
+    return returnData;
+  }
+
+  getTableTranslatableFieldsFileData() {
+    if (this.translatable_field_names.length === 0) {
+      return '';
+    }
+
+    let returnData = "";
+    for (var i = 0; i < this.translatable_field_names.length; i++) {
+      returnData += `
+          {
+            key: "${this.translatable_field_names[i]}",
+            label: this.$i18n.t('${GeneralHelper.eachWordCapitalize(this.translatable_field_names[i].replace('_', ' '))}')
+          },`;
     }
     return returnData;
   }
