@@ -16,7 +16,7 @@
 <script>
   import {{serviceName}} from './{{serviceName}}';
   import ErrorHelper from './../../services/errorHelper';
-  import Settings from './../../services/settings';
+  import i18nHelper from './../../services/i18nHelper';
 
   import {library} from '@fortawesome/fontawesome-svg-core'
   import {faPen} from '@fortawesome/free-solid-svg-icons'
@@ -58,7 +58,7 @@
         });
       },
       initTableData() {
-        let masterLanguage = Settings.getMasterLanguage();
+        let masterLanguage = i18nHelper.getMasterLanguage();
         const translatableFields = {{serviceName}}.getGeneralFields().translatableFields;
 
         this.{{listVariableName}}.forEach((obj) => {
