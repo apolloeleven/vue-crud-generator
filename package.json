@@ -1,6 +1,6 @@
 {
   "name": "vue-simple-crud-generator",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Following package generates simple crud for vue projects",
   "keywords": [
     "vue",
