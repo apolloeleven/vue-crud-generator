@@ -120,7 +120,9 @@ class Generator {
         .replace(/{{mainUrl}}/g, this.mainUrl)
         .replace(/{{inputFields}}/g, this.getFormInputFieldsFileData())
         .replace(/{{translatableInputFields}}/g, this.getFormTranslatableInputFieldsFileData())
-        .replace(/{{serviceName}}/g, this.serviceName);
+        .replace(/{{serviceName}}/g, this.serviceName)
+        .replace(/{{formDataFields}}/g, this.getFormDataFields())
+        .replace(/{{formValidatorFields}}/g, this.getFormValidatorsFields());
 
       fs.writeFile(newFile, result, 'utf8', function (err) {
         if (err) throw new Error(`Error while saving newly updated form component file. Message: ${err.message}`)
@@ -230,13 +232,34 @@ class Generator {
     return returnData.replace('{{innerData}}', innerData);
   }
 
+  getFormDataFields() {
+    let returnData = '';
+
+    this.field_names.forEach((fieldName) => {
+      returnData += `
+          ${fieldName}: '',`;
+    });
+
+    return returnData;
+  }
+
+  getFormValidatorsFields() {
+    let returnData = '';
+
+    this.field_names.forEach((fieldName) => {
+      returnData += `
+        ${fieldName}: {required},`;
+    });
+
+    return returnData;
+  }
+
   getServiceTranslatableFieldsData() {
     let returnData = "";
-    for (var i = 0; i < this.field_names.length; i++) {
+    for (var i = 0; i < this.translatable_field_names.length; i++) {
       returnData += `
         {
-          name: '${this.field_names[i]}',
-          type: 'text',
+          name: '${this.translatable_field_names[i]}'
         },`;
     }
     return returnData;

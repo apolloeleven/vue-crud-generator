@@ -47,8 +47,7 @@
         locales: i18nHelper.getAvailableLocales(),
         fields: [],
         translatableFields: {{serviceName}}.getGeneralFields().translatableFields,
-        {{objectVariableName}}: {
-          key: ''
+        {{objectVariableName}}: {{{formDataFields}}
         }
       };
 
@@ -57,10 +56,7 @@
       return data
     },
     validations() {
-      let validators = {
-        key: {
-          required
-        }
+      let validators = {{{formValidatorFields}}
       };
 
       this.translatableFields.forEach((field) => {
