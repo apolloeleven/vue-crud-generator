@@ -184,9 +184,13 @@ class Generator {
       const labelText = GeneralHelper.eachWordCapitalize(this.field_names[i].replace('_', ' '));
 
       returnData += `
-      <b-form-group b-form-group v-bind:label="$t('${labelText}')">
-        <b-form-input v-model="${vModelData}"></b-form-input>
-      </b-form-group>\n`;
+      <multi-input
+              :label="$t('${labelText}')"
+              :inputType="'text'"
+              :validator="$v.${vModelData}"
+              v-model="${vModelData}"
+              @onBlur="onBlur">
+      </multi-input>\n`;
     }
 
     return returnData;
@@ -202,9 +206,7 @@ class Generator {
       <div v-if="translatableFields.length > 0">
         <b-tabs content-class="mt-3">
           <b-tab v-for="locale in locales" v-bind:title="locale.name">
-            <div class="form-group">
-              {{innerData}}
-            </div>
+            {{innerData}}
           </b-tab>
         </b-tabs>
       </div>`;
@@ -213,13 +215,16 @@ class Generator {
 
     for (let i = 0; i < this.translatable_field_names.length; i++) {
       const labelText = GeneralHelper.eachWordCapitalize(this.translatable_field_names[i].replace('_', ' '));
+      const vModelText = `${this.unCapitalizedComponentName}['${this.translatable_field_names[i]}'][locale.key]`;
 
       innerData += `
-              <b-form-group v-bind:label="$t('${labelText}')">
-                <b-form-input v-model="${this.unCapitalizedComponentName}['${this.field_names[i]}'][locale.key]">
-                </b-form-input>
-              </b-form-group>\n`;
-
+              <multi-input
+                    :label="$t('${labelText}')"
+                    :inputType="'textarea'"
+                    :validator="$v.${vModelText} ? $v.${vModelText} : {}"
+                    v-model="${vModelText}"
+                    @onBlur="onBlur">
+              </multi-input>\n`;
     }
 
     return returnData.replace('{{innerData}}', innerData);

@@ -4,11 +4,25 @@
     <h1 v-if="{{objectVariableName}}.uuid">{{$t('Update')}} {{$t('{{componentNameVisual}}')}}</h1>
     <h1 v-if="!{{objectVariableName}}.uuid">{{$t('Create')}} {{$t('{{componentNameVisual}}')}}</h1>
 
+    <error-placeholder
+            @onDismissed="formErrors = []"
+            :form-errors="formErrors"></error-placeholder>
+
     <b-form @submit.prevent="onSubmit">
-      {{inputFields}}
-      {{translatableInputFields}}
-      <b-button type="submit" variant="primary" class="mr-1">{{$t('Submit')}}</b-button>
-      <b-button type="reset" variant="danger">{{$t('Reset')}}</b-button>
+      {{inputFields}}{{translatableInputFields}}
+
+      <b-button type="submit"
+                variant="primary"
+                :disabled="this.$v.$invalid"
+                class="mr-1">
+        {{$t('Submit')}}
+      </b-button>
+
+      <b-button type="reset"
+                to="/{{mainUrl}}"
+                variant="danger">
+        {{$t('Cancel')}}
+      </b-button>
 
     </b-form>
 
@@ -18,52 +32,86 @@
 <script>
 
   import {{serviceName}} from './{{serviceName}}';
-  import i18n from './../../services/i18n';
+  import i18nHelper from './../../services/i18nHelper';
+  import ErrorHelper from './../../services/errorHelper';
+  import MultiInput from "../../components/inputs/MultiInput";
+  import {required} from "vuelidate/lib/validators";
+  import ErrorPlaceholder from "../../components/general/ErrorPlaceholder";
 
   export default {
     name: "{{componentName}}Form",
+    components: {ErrorPlaceholder, MultiInput},
     data: () => {
-      return {
-        locales: [],
+      let data = {
+        formErrors: [],
+        locales: i18nHelper.getAvailableLocales(),
         fields: [],
-        translatableFields: [],
-        {{objectVariableName}}: {}
+        translatableFields: {{serviceName}}.getGeneralFields().translatableFields,
+        {{objectVariableName}}: {
+          key: ''
+        }
+      };
+
+      i18nHelper.initTranslatableFields(data.{{objectVariableName}}, data.translatableFields);
+
+      return data
+    },
+    validations() {
+      let validators = {
+        key: {
+          required
+        }
+      };
+
+      this.translatableFields.forEach((field) => {
+        validators[field.name] = {};
+        validators[field.name][i18nHelper.getMasterLanguage().key] = {
+          required
+        }
+      });
+
+      return {
+        {{objectVariableName}}: validators,
       }
     },
     methods: {
       onSubmit() {
-        if (this.{{objectVariableName}}.uuid) {
-          {{serviceName}}.update{{componentName}}(this.{{objectVariableName}}.uuid, this.{{objectVariableName}})
-            .then(response => {
-              this.$router.push({path: '/{{mainUrl}}'})
-            }, error => {
-              // TODO throw error
-            });
-        } else {
-          {{serviceName}}.create{{componentName}}(this.{{objectVariableName}})
-            .then(response => {
-              this.$router.push({path: '/{{mainUrl}}'})
-            }, error => {
-              // TODO throw error
-            });
+        this.$v.$touch();
+        this.save();
+      },
+      onBlur() {
+        this.$v.$touch();
+      },
+      save() {
+        if (!this.$v.$invalid) {
+
+          this.formErrors = [];
+
+          if (this.{{objectVariableName}}.uuid) {
+            {{serviceName}}.update{{componentName}}(this.{{objectVariableName}}.uuid, this.{{objectVariableName}})
+              .then(response => {
+                this.$router.push({path: '/{{mainUrl}}'})
+              }, error => {
+                ErrorHelper.handleErrors(this.formErrors, error.body);
+              });
+          } else {
+            {{serviceName}}.create{{componentName}}(this.{{objectVariableName}})
+              .then(response => {
+                this.$router.push({path: '/{{mainUrl}}'})
+              }, error => {
+                ErrorHelper.handleErrors(this.formErrors, error.body);
+              });
+          }
         }
       },
-      initFields() {
-        let generalFields = {{serviceName}}.getGeneralFields();
-        this.translatableFields = generalFields.translatableFields;
-      }
     },
     beforeMount() {
-      this.initFields();
-      this.locales = i18n.getAvailableLocales();
-      i18n.initTranslatableFields(this.{{objectVariableName}}, this.translatableFields);
-
       if (this.$route.params.id) {
         {{serviceName}}.get{{componentName}}(this.$route.params.id)
           .then(response => {
             this.{{objectVariableName}} = response.data;
           }, error => {
-            //TODO throw error
+            ErrorHelper.handleErrors(this.formErrors, error.body);
           });
       }
     }
