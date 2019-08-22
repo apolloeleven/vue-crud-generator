@@ -16,6 +16,7 @@ class Generator {
     this.field_names = params.field_names;
     this.translatable_field_names = params.translatable_field_names;
     this.api_url = params.api_url;
+    this.enable_pagination = params.enable_pagination;
   }
 
   init() {
@@ -53,6 +54,8 @@ class Generator {
     this.componentName = GeneralHelper.capitalize(this.unCapitalizedComponentName);
     this.componentNameVisual = this.name.replace(/([A-Z])/g, (g) => ` ${g[0].toUpperCase()}`);
     this.serviceName = `${this.componentName}Service`;
+    this.componentNamePlural = pluralize.plural(this.componentName);
+    this.listVariableName = pluralize.plural(this.unCapitalizedComponentName);
   }
 
   createMainComponent() {
@@ -68,12 +71,14 @@ class Generator {
       let result = data
         .replace(/{{mainDivClass}}/g, this.mainUrl)
         .replace(/{{componentName}}/g, this.componentName)
-        .replace(/{{componentNamePlural}}/g, pluralize.plural(this.componentName))
-        .replace(/{{listVariableName}}/g, pluralize.plural(this.unCapitalizedComponentName))
+        .replace(/{{componentNamePlural}}/g, this.componentNamePlural)
+        .replace(/{{listVariableName}}/g, this.listVariableName)
         .replace('{{tableFields}}', this.getTableFieldsFileData() + this.getTableTranslatableFieldsFileData())
         .replace(/{{mainUrl}}/g, this.mainUrl)
         .replace(/{{componentNameVisual}}/g, this.componentNameVisual.trim())
-        .replace(/{{serviceName}}/g, this.serviceName);
+        .replace(/{{serviceName}}/g, this.serviceName)
+        .replace(/{{dataGetterFunction}}/g, this.getMainComponentDataGetterFunctionTemplate())
+        .replace(/{{enablePagination}}/g, this.enable_pagination ? 'true' : 'false');
 
       fs.writeFile(newFile, result, 'utf8', function (err) {
         if (err) throw new Error(`Error while saving newly updated file. Message: ${err.message}`)
@@ -95,7 +100,7 @@ class Generator {
         .replace(/{{componentName}}/g, this.componentName)
         .replace(/{{apiUrl}}/g, this.api_url)
         .replace(/{{translatableFields}}/g, this.getServiceTranslatableFieldsData())
-        .replace(/{{componentNamePlural}}/g, pluralize.plural(this.componentName));
+        .replace(/{{componentNamePlural}}/g, this.componentNamePlural);
 
       fs.writeFile(newFile, result, 'utf8', function (err) {
         if (err) throw new Error(`Error while saving newly updated service file. Message: ${err.message}`)
@@ -263,6 +268,25 @@ class Generator {
         },`;
     }
     return returnData;
+  }
+
+  getMainComponentDataGetterFunctionTemplate() {
+    if (this.enable_pagination) {
+      return `async get${this.componentNamePlural}(pagination) {
+        const response = await ${this.serviceName}.get${this.componentNamePlural}({
+          limit: pagination.perPage,
+          page: pagination.currentPage
+        });
+
+        this.${this.listVariableName} = response.body.results;
+        pagination.totalCount = response.body.count;
+      }`;
+    } else {
+      return `async get${this.componentNamePlural}() {
+        const response = await ${this.serviceName}.get${this.componentNamePlural}();
+        this.${this.listVariableName} = response.body.results;
+      }`;
+    }
   }
 
   createFileFromTemplate(templateFile, newFile) {

@@ -32,11 +32,11 @@
 <script>
 
   import {{serviceName}} from './{{serviceName}}';
-  import i18nHelper from './../../services/i18nHelper';
-  import ErrorHelper from './../../services/errorHelper';
-  import MultiInput from "../../components/inputs/MultiInput";
+  import i18nHelper from './../../core/services/i18n.service';
+  import Helper from './../../core/services/helper.service';
+  import MultiInput from "../../core/components/multi-input/MultiInput";
   import {required} from "vuelidate/lib/validators";
-  import ErrorPlaceholder from "../../components/general/ErrorPlaceholder";
+  import ErrorPlaceholder from "../../core/components/common/ErrorPlaceholder";
 
   export default {
     name: "{{componentName}}Form",
@@ -88,14 +88,14 @@
               .then(response => {
                 this.$router.push({path: '/{{mainUrl}}'})
               }, error => {
-                ErrorHelper.handleErrors(this.formErrors, error.body);
+                Helper.handleErrors(this.formErrors, error.body);
               });
           } else {
             {{serviceName}}.create{{componentName}}(this.{{objectVariableName}})
               .then(response => {
                 this.$router.push({path: '/{{mainUrl}}'})
               }, error => {
-                ErrorHelper.handleErrors(this.formErrors, error.body);
+                Helper.handleErrors(this.formErrors, error.body);
               });
           }
         }
@@ -107,7 +107,7 @@
           .then(response => {
             this.{{objectVariableName}} = response.data;
           }, error => {
-            ErrorHelper.handleErrors(this.formErrors, error.body);
+            Helper.handleErrors(this.formErrors, error.body);
           });
       }
     }

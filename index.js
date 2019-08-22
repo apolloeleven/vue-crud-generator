@@ -14,7 +14,8 @@ let generator = new Generator({
   path: argv.path,
   field_names: argv['field-names'].split(','),
   translatable_field_names: argv['translatable-field-names'] ? argv['translatable-field-names'].split(',') : [],
-  api_url: argv['api-url']
+  api_url: argv['api-url'],
+  enable_pagination: argv['enable-pagination'],
 });
 
 generator.init();

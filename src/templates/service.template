@@ -3,7 +3,7 @@ import {AppSettings} from "../../shared/AppSettings";
 
 export default {
   get{{componentNamePlural}}(params = null) {
-    return Vue.http.get(AppSettings.getUrl('/{{apiUrl}}/'), params);
+    return Vue.http.get(AppSettings.getUrl('/{{apiUrl}}/'), {params});
   },
   get{{componentName}}(id) {
     return Vue.http.get(AppSettings.getUrl(`/{{apiUrl}}/${id}`));

@@ -27,5 +27,11 @@ module.exports = {
     alias: 'au',
     describe: 'Api endpoint url for services.',
     string: true
+  },
+  'enable-pagination': {
+    demand: true,
+    alias: 'ep',
+    describe: 'Whether to implement pagination to list component.',
+    boolean: true
   }
 };

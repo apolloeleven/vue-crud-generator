@@ -1,37 +1,33 @@
 <template>
   <div class="{{mainDivClass}}">
     <b-button variant="success" to="/{{mainUrl}}/create">{{$t('Create')}} {{$t('{{componentNameVisual}}')}}</b-button>
-    <b-table class="main-table" responsive bordered :items="tableData" :fields="tableFields">
-
-
-      <template slot="actions" slot-scope="data">
-        <b-button variant="success" class="btn mr-1" @click="update(data.item)" v-b-tooltip.hover v-bind:title="$t('Update')">
-          <font-awesome-icon :icon="'pen'"></font-awesome-icon>
-        </b-button>
-      </template>
-    </b-table>
+    <ams-table
+            :translatableFields="translatableFields"
+            :objects="{{listVariableName}}"
+            :tableFields="tableFields"
+            :dataGetterFunction="get{{componentNamePlural}}"
+            :enablePagination="{{enablePagination}}"
+            :updateUrl="'{{mainUrl}}/'">
+    </ams-table>
   </div>
 </template>
 
 <script>
   import {{serviceName}} from './{{serviceName}}';
-  import ErrorHelper from './../../services/errorHelper';
-  import i18nHelper from './../../services/i18nHelper';
-
-  import {library} from '@fortawesome/fontawesome-svg-core'
-  import {faPen} from '@fortawesome/free-solid-svg-icons'
-
-  library.add(faPen);
+  import AmsTable from "../../core/components/ams-table/AmsTable";
 
   export default {
     name: "{{componentName}}",
+    components: {AmsTable},
     data: () => {
       return {
         {{listVariableName}}: [],
-        tableData: [],
       }
     },
     computed: {
+      translatableFields() {
+        return {{serviceName}}.getGeneralFields().translatableFields
+      },
       tableFields() {
         return [{{tableFields}}
           {
@@ -43,44 +39,11 @@
       }
     },
     methods: {
-      get{{componentNamePlural}}() {
-        {{serviceName}}.get{{componentNamePlural}}()
-          .then(response => {
-            this.{{listVariableName}} = response.body;
-            this.initTableData();
-          }, error => {
-            ErrorHelper.handleErrors(this.formErrors, error.body);
-          })
-      },
-      update(item) {
-        this.$router.push({
-          path: `{{mainUrl}}/${item.uuid}`
-        });
-      },
-      initTableData() {
-        let masterLanguage = i18nHelper.getMasterLanguage();
-        const translatableFields = {{serviceName}}.getGeneralFields().translatableFields;
-
-        this.{{listVariableName}}.forEach((obj) => {
-          const tmpObj = Object.assign(obj, {});
-          translatableFields.forEach((field) => {
-            tmpObj[field.name] = tmpObj[field.name][masterLanguage.key];
-          });
-          this.tableData.push(tmpObj);
-        });
-      },
+      {{dataGetterFunction}}
     },
-    beforeMount() {
-      this.get{{componentNamePlural}}();
-    }
   }
 </script>
 
 <style lang="scss" scoped>
-  .{{mainDivClass}} {
-    .main-table {
-      margin-top: 10px;
-    }
-  }
 </style>
 
